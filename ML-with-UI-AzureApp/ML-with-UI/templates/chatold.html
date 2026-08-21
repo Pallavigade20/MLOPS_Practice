@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vodafone Billing Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#e60000; margin:0; }
+    header { background:#fff; color:#e60000; padding:10px; display:flex; align-items:center; }
+    header img { height:40px; margin-right:10px; }
+    nav { margin-left:auto; }
+    nav a { color:#e60000; margin:0 10px; text-decoration:none; font-weight:bold; }
+    nav a:hover { text-decoration:underline; }
+
+    .container {
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      margin:30px;
+    }
+
+    #infoBox {
+      width:40%;
+      color:white;
+      padding:20px;
+      font-size:16px;
+      line-height:1.5;
+    }
+
+    #chatbox {
+      width:500px;
+      background:#fff;
+      padding:20px;
+      border-radius:8px;
+      box-shadow:0 0 10px rgba(0,0,0,0.2);
+      margin-left:30px;
+    }
+
+    .message { margin:10px 0; }
+    .bot { text-align:left; color:green; }
+    input, button { padding:8px; margin-top:10px; width:100%; border:1px solid #ccc; border-radius:4px; }
+    button { background:#e60000; color:#fff; cursor:pointer; }
+    button:hover { background:#b30000; }
+
+    #predictionResult {
+      margin-top:30px;
+      text-align:center;
+      font-size:64px;   /* Extremely large font */
+      font-weight:bold;
+      color:white;
+    }
+
+    #robotImage {
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      width:200px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo">
+    <h2>Vodafone Billing Predictor</h2>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Help</a>
+    </nav>
+  </header>
+
+  <!-- Main container with info text + chatbox -->
+  <div class="container">
+    <!-- Info text on left -->
+    <div id="infoBox">
+      <h3>Predicting Tomorrow’s Bill, Today</h3>
+      <p>
+        Our AI-powered Billing Prediction App helps customers understand and anticipate their upcoming mobile bills with greater clarity and confidence. By analyzing usage patterns, data consumption, calling behavior, plan details, and historical billing information, the app provides an intelligent estimate of the next bill—helping customers stay informed and avoid unexpected charges.
+      </p>
+      <p>
+        Powered by AI and predictive analytics, the solution turns complex usage data into simple, actionable insights. Customers can easily see their predicted bill, understand the key factors driving their charges, and make smarter choices about their usage and plans.
+      </p>
+    </div>
+
+    <!-- Chatbox on right -->
+    <div id="chatbox">
+      <div id="messages">
+        <div class="message bot">Bot: 👋 Welcome! Enter customer data below and I’ll predict billing status.</div>
+      </div>
+      <input id="dataGB" placeholder="Monthly Data Usage (GB)">
+      <input id="calls" placeholder="Average Call Count">
+      <input id="bill" placeholder="Monthly Bill">
+      <input id="ratio" placeholder="Usage/Bill Ratio">
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="clearForm()">Clear</button>
+      <div id="predictionResult"></div>
+    </div>
+  </div>
+
+  <!-- Robot image -->
+  <img id="robotImage" src="{{ url_for('static', filename='vois.png') }}" alt="Vodafone Robot">
+
+  <script>
+    function sendMessage() {
+      let data = {
+        MonthlyDataUsage: parseFloat(document.getElementById("dataGB").value),
+        AverageCallCount: parseFloat(document.getElementById("calls").value),
+        MonthlyBill: parseFloat(document.getElementById("bill").value),
+        UsageBillingRatio: parseFloat(document.getElementById("ratio").value)
+      };
+
+      fetch("/predict", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        // Show only bot prediction, not user input
+        document.getElementById("predictionResult").innerText = res.response;
+      });
+    }
+
+    function clearForm() {
+      document.getElementById("dataGB").value = "";
+      document.getElementById("calls").value = "";
+      document.getElementById("bill").value = "";
+      document.getElementById("ratio").value = "";
+      document.getElementById("predictionResult").innerText = "";
+    }
+  </script>
+</body>
+</html>
